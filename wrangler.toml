@@ -1,8 +1,12 @@
 name = "cloudflarechataibot"
 main = "src/index.ts"
 compatibility_date = "2023-11-21"
+node_compat = false
 
 [[d1_databases]]
 binding = "DB" # i.e. available in your Worker on env.DB
-database_name = "northwind-demo"
-database_id = "" # Replace with your ID from `wrangler d1 create`
+database_name = "cf-chat-ai-bot-d1"
+database_id = "dc8bd759-1168-4822-b2dc-24bf4a7a82ca"
+
+[ai]
+binding = "AI"

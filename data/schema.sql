@@ -1,0 +1,4 @@
+PRAGMA foreign_keys=off;
+CREATE TABLE IF NOT EXISTS "users" ( "id" INTEGER PRIMARY KEY NOT NULL, "conversation_id" INTEGER NULL, "ai_model" VARCHAR(255) NULL);
+CREATE TABLE IF NOT EXISTS "conversations" ( "id" integer not null primary key autoincrement, "user_id" integer not null, "last_accessed" datetime NOT NULL default CURRENT_TIMESTAMP, "messages" integer not null default 1);
+CREATE TABLE IF NOT EXISTS "messages" ( "id" integer not null primary key autoincrement, "content" TEXT NOT NULL, "telegram_msg_id" INTEGER, "conversation_id" INTEGER not null, "bot_message" BOOLEAN default false, "timestamp" datetime NOT NULL default CURRENT_TIMESTAMP );

@@ -1,5 +1,7 @@
 wrangler-local-state
 dist
+node_modules
+data/index
 
 # wrangler files
 .wrangler

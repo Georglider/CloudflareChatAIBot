@@ -1,45 +1,38 @@
-# Template: worker-d1
+# Template: CloudflareChatAIBot
 
-[![Deploy with Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/workers-sdk/tree/main/templates/worker-d1)
+[![Deploy with Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Georglider/CloudflareChatAIBot)
 
-This project is based off the Default Typescript Worker starter. To create a new project like this, run the following:
+## Overview
 
-```sh
-npx wrangler@latest generate northwind-demo worker-d1
-```
+This project is a telegram bot which provides interaction with various text generation models supported by [Cloudflare Workers AI](https://ai.cloudflare.com)
 
-### Getting started
+## Features
 
-Next, run the following commands in the console:
+* Select the text generation model to interact with
+* Toggle LLM response streaming on/off
+* Handle streaming and non-streaming LLM responses for Telegram chat
+* Parse and display markdown in LLM responses
+* Create and switch between the conversations with AI
 
-```sh
-# Make sure you've logged in
-npx wrangler login
+## Prerequisites
 
-# Create the D1 Database
-npx wrangler d1 create northwind-demo
+* [Telegram Bot's API Token](https://t.me/botfather)
+* [Cloudflare Account](https://cloudflare.com): Required for using Workers AI models and D1 and deploying the project on Cloudflare Workers
 
-# Add config to wrangler.toml as instructed
+## Variables
 
-# Fill the DB with seed data from an SQL file:
-npx wrangler d1 execute northwind-demo --file ./data/northwind.sql
+* [WEBHOOK_SECRET](https://core.telegram.org/bots/api#:~:text=all%20pending%20updates-,secret_token,-String)
+* DASHBOARD_SECRET: Password in order for you to control the bot via dashboard
+* BOT_TOKEN: Bot API token from [BotFather](https://t.me/botfather)
+* [CLOUDFLARE_ACCOUNT_ID](https://developers.cloudflare.com/fundamentals/setup/find-account-and-zone-ids/#find-account-id-workers-and-pages): Required for getting LLM model list
+* [CLOUDFLARE_API_TOKEN](https://developers.cloudflare.com/cloudflare-one/api-terraform/scoped-api-tokens/#creating-a-scoped-api-token): (required permission: **Workers AI:Read**) Required for getting LLM model list
+* [DEFAULT_AI_MODEL](https://developers.cloudflare.com/workers-ai/models/#text-generation): (format: @cf/meta/llama-3-8b-instruct)
+* DEV_SERVER_URL: (format: "https://example.com/"); Can be used for local development
 
-# Deploy the worker
-npx wrangler deploy
-```
-
-Then test out your new Worker!
-
-### Developing locally
-
-To develop on your Worker locally:
-
-```sh
-# Fill the DB with seed data from an SQL file:
-npx wrangler d1 execute northwind-demo --file ./data/northwind.sql --local
-
-# Then run wrangler dev --local with persistence
-npx wrangler dev --local
-```
-
-**Note:** the local D1 development environment is under active development and may have some incorrect behaviour. If you have issues, run `npm install wrangler@latest` to make sure you're on the latest version, or provide feedback in Discord.
+## Enabling the bot
+> Assuming that you have deployed this project using Cloudflare Workers and configured variables from the previous step
+1. Go to your Cloudflare Worker's link
+2. Click "Admin panel" button on the top right of the page
+3. Paste in WEBHOOK_SECRET's content
+4. Click on "Set webhook" button
+5. You can now use the bot in Telegram
