@@ -11,12 +11,16 @@ export interface Env {
   CLOUDFLARE_ACCOUNT_ID: string;
   CLOUDFLARE_API_TOKEN: string;
   DEFAULT_AI_MODEL?: string;
+  MESSAGE_STREAMING_COOLDOWN?: string;
+  MESSAGE_STREAMING_INITIAL_COOLDOWN?: string;
+  MESSAGE_STREAMING_ENABLED?: string;
+  WHITELIST_ENABLED?: string;
+  WHITELIST_ENTITIES?: string;
 }
 
 export default {
 	async fetch(request: Request, env: Env, ctx: any) {
     if (request.method == 'POST') {
-      console.log(request.headers.get('authorization'))
       if (request.url.endsWith("ebhook") && request.headers.get('authorization')?.substring(7) == env.DASHBOARD_SECRET) {
         const url = new URL(request.url)
         if (url.pathname.startsWith("/set")) return registerWebhook(env.BOT_TOKEN, url, env.WEBHOOK_SECRET, env.DEV_SERVER_URL)

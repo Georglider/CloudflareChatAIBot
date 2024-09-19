@@ -1,6 +1,7 @@
 import { Update } from 'node-telegram-bot-api/index'
 import { apiURL, Env, request } from '.'
 import { getModels, findModel } from './models'
+import { getCooldown, getInitialCooldown, isStreaming, isUserWhitelisted } from './settings'
 
 type Conversation = {
   id: number,
@@ -20,6 +21,12 @@ const process = async (update: Update, env: Env) => {
   const message = update.message
   const text = message?.text
   if (message && text) {
+    if (!isUserWhitelisted(message.chat.id, env)) return Response.json({
+      "chat_id": message.chat.id,
+      "text": '<b>You are not allowed to use this bot!</b>',
+      "method": "sendmessage",
+      "parse_mode": "html"
+    })
     if (text.startsWith("/")) return Response.json({
       "chat_id": message.chat.id,
       "text": await processCommand(text.substring(1), update, env),
@@ -87,19 +94,19 @@ const userQueryUpdater = async (env: Env, userId: number, updateQuery: Promise<a
 
 const processCommand = async (command: string, update: Update, env: Env) => {
   if (command.startsWith('new')) {
-    if (!update.message?.chat.id) return formatMessage('Account not found!')
-    return await env.DB.prepare("UPDATE users SET conversation_id = NULL WHERE id = ?1").bind(update.message?.chat.id).run().finally(() => formatMessage('New conversation started!'))
+    if (!update.message?.chat.id) return 'Account not found!'
+    return await env.DB.prepare("UPDATE users SET conversation_id = NULL WHERE id = ?1").bind(update.message?.chat.id).run().then(() => 'New conversation started!')
   } else if (command.startsWith('llm')) {
     const foundModel = await findModel(command.substring(4).replaceAll('_', '-'), env)
     if (!update.message?.chat.id) return formatMessage('Account not found!')
     if (foundModel) return userQueryUpdater(env, 
       update.message?.chat.id, 
-      env.DB.prepare("UPDATE users SET ai_model = ?1 WHERE id = ?2").bind(foundModel, update.message?.chat.id).run().finally(() => formatMessage('LLM Switched!')),
-      env.DB.prepare("INSERT INTO users (id, ai_model) VALUES (?1, ?2)").bind(update.message?.from?.id, foundModel ? foundModel : env.DEFAULT_AI_MODEL ? env.DEFAULT_AI_MODEL : (await getModels(env)).at(0)?.name).run().finally(() => formatMessage('LLM Switched!'))
+      env.DB.prepare("UPDATE users SET ai_model = ?1 WHERE id = ?2").bind(foundModel, update.message?.chat.id).run().then(() => `LLM Switched to ${foundModel}!`),
+      env.DB.prepare("INSERT INTO users (id, ai_model) VALUES (?1, ?2)").bind(update.message?.from?.id, foundModel ? foundModel : env.DEFAULT_AI_MODEL ? env.DEFAULT_AI_MODEL : (await getModels(env)).at(0)?.name).run().then(() => `LLM Switched to ${foundModel}!`)
     )
-    return formatMessage("LLM not found")
+    return "LLM not found"
   }
-  return formatMessage("Command not found!")
+  return "Command not found!"
 }
 
 const sendMessage = async (botToken: string, chatId: number, message: string) => {
@@ -136,12 +143,13 @@ const processAI = (context: Message[], aiModel: BaseAiImageToTextModels, env: En
 
   return env.AI.run(aiModel, {
     messages,
-    stream: true
+    stream: isStreaming(env)
   })
 }
 
 export async function streamMessage(stream: ReadableStream<Uint8Array>, botToken: string, chatId: number, conversationId: number, env: Env): Promise<Response> {
-  var nextCheckTime = new Date().getTime() + 2000
+  var nextCheckTime = new Date().getTime() + getInitialCooldown(env)
+  const cooldown = getCooldown(env)
   let result = '';
   let msgId: number | undefined = undefined;
   const reader = stream.pipeThrough(new TextDecoderStream()).getReader();
@@ -161,7 +169,7 @@ export async function streamMessage(stream: ReadableStream<Uint8Array>, botToken
           .then((resp: any) => resp['result']['message_id'])
           .catch((err) => console.error(err))
       }
-      nextCheckTime = new Date().getTime() + 3500
+      nextCheckTime = new Date().getTime() + cooldown
     }
     result += value;
   }
