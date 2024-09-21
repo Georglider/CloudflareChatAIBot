@@ -8,5 +8,8 @@ binding = "DB" # i.e. available in your Worker on env.DB
 database_name = "cf-chat-ai-bot-d1"
 database_id = "dc8bd759-1168-4822-b2dc-24bf4a7a82ca"
 
+[placement]
+mode = "smart"
+
 [ai]
 binding = "AI"

@@ -1,6 +1,7 @@
 # Template: CloudflareChatAIBot
 
 [![Deploy with Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Georglider/CloudflareChatAIBot)
+##### Note: If you Deploy with Workers instead of using wrangler, please make sure your CLOUDFLARE_API_TOKEN contains 'Account:Workers AI:Read', 'User:Memberships:Read', 'User:User Details:Read', 'Account:D1:Read', 'Account:D1:Write'  permissions
 
 ## Overview
 
