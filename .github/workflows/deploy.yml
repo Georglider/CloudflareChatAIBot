@@ -15,7 +15,10 @@ jobs:
         uses: cloudflare/wrangler-action@v3
         continue-on-error: true
         with:
-          preCommands: |
-            wrangler d1 create cf-chat-ai-bot-d1
-            wrangler d1 execute cloudflarechataibot --remote --file=./data/schema.sql
+          workingDirectory: "bot"
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+      - name: print wrangler command output
+        env:
+          CMD_OUTPUT: ${{ steps.deploy.outputs.command-output }}
+        run: echo $CMD_OUTPUT
