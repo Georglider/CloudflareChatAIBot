@@ -15,7 +15,6 @@ jobs:
         uses: cloudflare/wrangler-action@v3
         continue-on-error: true
         with:
-          workingDirectory: "bot"
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
       - name: print wrangler command output
